@@ -74,6 +74,7 @@ class _SignUpPageState extends State<SignUpPage> {
             ),
             SizedBox(height: 10,),
             TextField(
+              obscureText: true,
               controller: passwordController,
               decoration: InputDecoration(
                 hintText: "Password",
@@ -86,11 +87,11 @@ class _SignUpPageState extends State<SignUpPage> {
               height: 45,
               child: FlatButton(
                 onPressed: (){
-                  _doSignUp;
+                  _doSignUp();
 
                 },
-                color: Colors.blue,
-                child: Text("Sign In",style: TextStyle(color: Colors.white),),
+                color: Colors.deepOrange,
+                child: Text("Sign Up",style: TextStyle(color: Colors.white),),
               ),
 
             ),

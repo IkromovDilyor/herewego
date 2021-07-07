@@ -57,6 +57,7 @@ class _SignInPageState extends State<SignInPage> {
             ),
             SizedBox(height: 10,),
             TextField(
+              obscureText: true,
               controller: passwordController,
               decoration: InputDecoration(
                 hintText: "Password",
@@ -71,7 +72,7 @@ class _SignInPageState extends State<SignInPage> {
                   _doSignIn();
 
                 },
-                color: Colors.blue,
+                color: Colors.deepOrange,
                 child: Text("Sign In",style: TextStyle(color: Colors.white),),
               ),
 
