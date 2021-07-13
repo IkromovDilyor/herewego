@@ -10,7 +10,7 @@ class RTDBService {
   }
 
   static Future<List<Post>> getPosts(String id) async {
-    List<Post> items = new List();
+    List<Post> items = [];
     Query _query = _database.reference().child("posts").orderByChild("userId").equalTo(id);
     var snapshot = await _query.once();
     var result = snapshot.value.values as Iterable;

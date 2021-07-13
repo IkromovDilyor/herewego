@@ -1,8 +1,9 @@
 {
   "project_info": {
     "project_number": "949609422949",
+    "firebase_url": "https://herewego-a6476-default-rtdb.firebaseio.com",
     "project_id": "herewego-a6476",
-    "storage_bucket": "https://herewego-a6476-default-rtdb.firebaseio.com/"
+    "storage_bucket": "herewego-a6476.appspot.com"
   },
   "client": [
     {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:herewego/model/post_model.dart';
 import 'package:herewego/services/prefs_service.dart';
 import 'package:herewego/services/rtdb_service.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class DetailPage extends StatefulWidget {
   const DetailPage({Key key}) : super(key: key);
@@ -15,6 +16,7 @@ class _DetailPageState extends State<DetailPage> {
 
   var titleController=TextEditingController();
   var contentController=TextEditingController();
+
 
 
   _addPost() async {
