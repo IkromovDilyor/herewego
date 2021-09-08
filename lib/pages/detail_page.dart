@@ -1,84 +1,161 @@
+
+
+import 'dart:html';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:herewego/model/post_model.dart';
 import 'package:herewego/services/prefs_service.dart';
 import 'package:herewego/services/rtdb_service.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:image_picker/image_picker.dart';
 
 class DetailPage extends StatefulWidget {
+  static final String id = 'detail_page';
+
   const DetailPage({Key key}) : super(key: key);
- static final String id="detail_page";
+
   @override
   _DetailPageState createState() => _DetailPageState();
 }
 
 class _DetailPageState extends State<DetailPage> {
+  final firstnameController = TextEditingController();
+  final lastnameController = TextEditingController();
+  final contentController = TextEditingController();
+  final dateController = TextEditingController();
 
-  var titleController=TextEditingController();
-  var contentController=TextEditingController();
+  bool _isLoading = false;
 
+  final picker = ImagePicker();
+  File _image;
 
+  Future _getImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
 
-  _addPost() async {
-
-    String  title=titleController.text.toString();
-    String content=contentController.text.toString();
-    var userId =await Prefs.loadUserId();
-    RTDBService.addPost(new Post (userId,  title, content));
-
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
   }
-
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text('Add Post'),
         centerTitle: true,
-        title: Text("Add Post"),
+        backgroundColor: Colors.red,
       ),
-      body: SingleChildScrollView(
-
-        child: Container(
-          padding: EdgeInsets.all(30),
-          height: MediaQuery.of(context).size.height,
-          child: Column(
-            children: [
-              SizedBox(height: 15,),
-
-              TextField(
-                controller: titleController,
-                decoration: InputDecoration(
-                  hintText: "Title"
+      body: Stack(
+        children: [
+          Container(
+            padding: EdgeInsets.all(30),
+            child: Column(
+              children: [
+                GestureDetector(
+                  onTap: _getImage,
+                  child: Container(
+                    height: 100,
+                    width: 100,
+                    child: _image == null ?
+                    Image.asset('assets/images/ic_picture.png') :
+                    Image.file(_image),
+                  ),
                 ),
-              ),
-              SizedBox(height: 15,),
-              TextField(
-                controller: contentController,
-                decoration: InputDecoration(
-                    hintText: "Content"
+
+                // TextField : Firstname
+                TextField(
+                  controller: firstnameController,
+                  decoration: InputDecoration(
+                    hintText: 'Firstname',
+                  ),
                 ),
-              ),
-            SizedBox(height: 15,),
-             Container(
-               width: double.infinity,
-               height: 45,
-               child: FlatButton(
-                 onPressed: _addPost,
 
-                 color: Colors.blue,
-                 child: Center(
-                   child: Text("Add", style: TextStyle(color: Colors.white),),
-                 ),
-               ),
-             )
+                SizedBox(height: 15,),
 
+                // TextField : Lastname
+                TextField(
+                  controller: lastnameController,
+                  decoration: InputDecoration(
+                    hintText: 'Lastname',
+                  ),
+                ),
 
-            ],
+                SizedBox(height: 15,),
+
+                // TextField : Content
+                TextField(
+                  controller: contentController,
+                  decoration: InputDecoration(
+                    hintText: 'Content',
+                  ),
+                ),
+
+                SizedBox(height: 15,),
+
+                // TextField : Date
+                TextField(
+                  controller: dateController,
+                  decoration: InputDecoration(
+                    hintText: 'Date',
+                  ),
+                ),
+
+                SizedBox(height: 15,),
+
+                FlatButton(
+                  height: 45,
+                  minWidth: double.infinity,
+                  color: Colors.red,
+                  child: Text('Add', style: TextStyle(color: Colors.white),),
+                  onPressed: _addPost,
+                ),
+              ],
+            ),
           ),
-        ),
 
+          _isLoading ? Center(child: CircularProgressIndicator(),) :
+          SizedBox.shrink(),
+        ],
       ),
     );
+  }
+
+  _addPost() async {
+    String firstname = firstnameController.text.toString();
+    String lastname = lastnameController.text.toString();
+    String content = contentController.text.toString();
+    String date = dateController.text.toString();
+
+    if (firstname.isEmpty || lastname.isEmpty || content.isEmpty || date.isEmpty || _image == null) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    StoreService.uploadImage(_image).then((image_url) => {
+      _apiAddPost(firstname, lastname, content, date, image_url),
+    });
+
+
+  }
+
+  _apiAddPost(String firstname, String lastname, String content, String date, String img_url) async {
+    var id = await Prefs.loadUserId();
+
+    RTDBService.addPost(Post(id.toString(), firstname, lastname, content, date, img_url)).then((_) => {
+      respAddPost(),
+    });
+  }
+
+  respAddPost() {
+    setState(() {
+      _isLoading = false;
+    });
+    Navigator.of(context).pop({'data' : 'done'});
   }
 }
